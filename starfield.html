@@ -4,11 +4,17 @@
     <title>CanvasDemo</title>
 </head>
 <body>
-    <canvas id="screen" width="100%" height="100%" border="0px" ></canvas>
+    <div>
+        <canvas id="screen" width="100%" height="100%" zindex=0 border="0px" ></canvas>
+        <div zindex=1 style="color:white;">
+            <center>
+                Hello
+            </center>
+        </div>
+    </div>
     <script type="text/javascript">
         var canvas = document.getElementById("screen").getContext("2d");
         canvas.fillRect(0, 0, canvas.width, canvas.height);
-
         canvas.canvas.width  = window.innerWidth;
         canvas.canvas.height = window.innerHeight;
 
@@ -20,18 +26,20 @@
         const GROWTH_RATE = 1.04;
 
         const DRAW_LINES = true;
-        const DRAW_ARCS = false;
+        const DRAW_ARCS = true;
 
         const CONTROL_SPEED = 3;
 
+        var OFFSET = [0, 0];
+
         class Star{
             constructor(){
-                this.xPos = window.innerWidth / 2;
-                this.yPos = window.innerHeight / 2;
+                this.xPos = WIDTH / 2;
+                this.yPos = HEIGHT / 2;
                 this.xVel = 3*(Math.random()-.5);
                 this.yVel = 3*(Math.random()-.5);
-                this.xPos += (150* this.xVel)
-                this.yPos += (150* this.yVel)
+                this.xPos += (150* this.xVel);
+                this.yPos += (150* this.yVel);
                 this.vel = .5+Math.random();
                 this.size = Math.random()/5;
             }
@@ -41,8 +49,8 @@
         function updateStar(s){
             var oldX = s.xPos
             var oldY = s.yPos
-            s.xPos += (s.xVel * s.vel);
-            s.yPos += (s.yVel * s.vel);
+            s.xPos += (s.xVel * s.vel) + (OFFSET[0]*CONTROL_SPEED);
+            s.yPos += (s.yVel * s.vel) + (OFFSET[1]*CONTROL_SPEED);
             s.size *= GROWTH_RATE;
             s.vel *= SPEED;
             canvas.fillStyle = "#FFFFFF";
@@ -66,6 +74,30 @@
                            
         }
 
+        document.onkeypress = function(evt) {
+            evt = evt || window.event;
+            var charCode = evt.keyCode || evt.which;
+            var charStr = String.fromCharCode(charCode);
+            switch(charStr){
+                case "w":
+                    OFFSET[1] = 1;
+                    break;
+                case "s":
+                    OFFSET[1] = -1;
+                    break;
+                case "a":
+                    OFFSET[0] = 1;
+                    break;
+                case "d":
+                    OFFSET[0] = -1;
+                    break;
+                default:
+                    OFFSET[0] = 0;
+                    OFFSET[1] = 0;
+                    break;
+            }
+        };
+
         function update() {
             // Update Canvas
             canvas.fillStyle="#000000";
@@ -82,8 +114,7 @@
             }
         }
         console.log("Running in window: "+window.innerWidth+" x "+window.innerHeight);
-        alert("Welcome to space or something")
-        setInterval(update, 1000/60)
+        setInterval(update, 1000/80)
     </script>
 </body>
 </html>
