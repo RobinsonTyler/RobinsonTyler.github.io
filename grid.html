@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CanvasDemo</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="grid.css" type="text/css"></link>
+</head>
+<body>
+    <div id="container">
+        <canvas id="screen" width="100%" height="100%" zindex=0 border="0px" ></canvas>
+        <div id="overlay" style="color:white;">
+            <center>
+                <!--Hello-->
+            </center>
+        </div>
+    </div>
+    <script type="text/javascript">
+        var canvas = document.getElementById("screen").getContext("2d");
+        canvas.fillRect(0, 0, canvas.width, canvas.height);
+        canvas.canvas.width  = window.innerWidth;
+        canvas.canvas.height = window.innerHeight;
+
+        const WIDTH = window.innerWidth;
+        const HEIGHT = window.innerHeight;
+
+        const LINE_COL = "#0E00EE"
+        const BACK_COL = "#000000"
+        const HORIZON = HEIGHT / 2
+
+        const SPEED = 1
+
+        class Line{
+            constructor(val){
+                this.width = 1
+                this.yPos = val
+            }
+        }
+        var lines = [];
+
+        function updateLine(line){
+            line.yPos *= (SPEED * 1.01)
+            line.width *= (SPEED * 1.005)
+            canvas.strokeStyle = LINE_COL
+                canvas.beginPath();
+                canvas.moveTo(0, line.yPos + HORIZON)
+                canvas.lineTo(WIDTH, line.yPos + HORIZON)
+                canvas.lineWidth = line.width - 1
+                canvas.stroke();
+                canvas.closePath();
+            return line.yPos + HORIZON > HEIGHT
+        }
+
+
+        function drawBackground(){
+            var count = 20
+            var spread = 10
+            for (var i = count; i >= 0; i--) {
+                canvas.strokeStyle = LINE_COL
+                canvas.beginPath();
+                canvas.moveTo(WIDTH * ((i + 1) / count), HORIZON)
+                canvas.lineTo(WIDTH * (i / count), HORIZON)
+                canvas.lineTo((WIDTH * (i / count) - (WIDTH / 2.2))* spread, HEIGHT + 10)
+                canvas.lineWidth = ((count / 2) - Math.abs(i - (count / 2))) / (spread / 2)
+                canvas.stroke();
+                canvas.closePath();                
+            }
+
+        }
+
+        function draw_sun(){
+            var radius = Math.floor(HORIZON / 3)
+            var center_x = WIDTH / 2
+            var center_y = HORIZON / 2
+            var range = Math.ceil(250 / (2 * radius))
+            var green = 10
+            var i = 0
+            for (var i = radius; i >= -radius; i--) {
+                green += range
+                if (i % 6 == 0){
+                    var half_row = Math.sqrt(radius * radius - (i * i))
+                    green = (green < 255)? green : 255
+
+                    var col = ("0"+Math.floor(green).toString(16)).slice(-2)
+                    
+                    canvas.strokeStyle = "#EE"+col+"00"
+                    canvas.beginPath();
+                    
+                    canvas.moveTo(-half_row + center_x, i+center_y);
+                    canvas.lineTo(half_row + center_x, i+center_y);
+                    canvas.lineWidth = 2
+                    canvas.stroke();
+                    canvas.closePath();
+                }
+            }
+        }
+
+        document.onkeypress = function(evt) {
+            evt = evt || window.event;
+            var charCode = evt.keyCode || evt.which;
+            var charStr = String.fromCharCode(charCode);
+        };
+
+        count = 0
+
+        function update() {
+            // Update Canvas
+            canvas.fillStyle = BACK_COL
+            canvas.fillRect(0, HORIZON, WIDTH, HEIGHT)
+
+            drawBackground()
+
+            if (count++ > 60){
+                count = 0
+                lines.push(new Line(10))
+            }
+
+            for (var i = lines.length - 1; i >= 0; i--) {
+                if (updateLine(lines[i]))
+                    lines.splice(i, 1);
+            }
+        }
+
+        last_time = performance.now()
+        fps_time = 80
+        interval = 1000 / fps_time + 1
+
+        function fps(){
+            new_time = performance.now()
+            delta = new_time - last_time
+            if (delta >= interval) {
+                last_time = new_time
+                update()
+            }
+        }
+
+        canvas.fillStyle = BACK_COL
+        canvas.fillRect(0, 0, WIDTH, HEIGHT)
+        draw_sun()
+        console.log("Running in window: "+window.innerWidth+" x "+window.innerHeight);
+        setInterval(fps, 10)
+    </script>
+</body>
+</html>

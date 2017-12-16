@@ -2,11 +2,13 @@
 <html>
 <head>
     <title>CanvasDemo</title>
+    <meta charset="utf-8">
+    <style rel="stylesheet" href="grid.css" type="text/css"></style>
 </head>
 <body>
-    <div>
+    <div id="container">
         <canvas id="screen" width="100%" height="100%" zindex=0 border="0px" ></canvas>
-        <div zindex=1 style="color:white;">
+        <div id="overlay" style="color:white;">
             <center>
                 Hello
             </center>
@@ -21,7 +23,7 @@
         const WIDTH = window.innerWidth;
         const HEIGHT = window.innerHeight;
 
-        const STARS_PER_UPDATE = 2;
+        const STARS_PER_UPDATE = 1;
         const SPEED = 1.05;
         const GROWTH_RATE = 1.04;
 
