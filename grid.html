@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="grid.css" type="text/css"></link>
 </head>
-<body>
+<body onresize="init()">
     <div id="container">
         <canvas id="screen" width="100%" height="100%" zindex=0 border="0px" ></canvas>
         <div id="overlay" style="color:white;">
@@ -15,19 +15,74 @@
         </div>
     </div>
     <script type="text/javascript">
-        var canvas = document.getElementById("screen").getContext("2d");
-        canvas.fillRect(0, 0, canvas.width, canvas.height);
-        canvas.canvas.width  = window.innerWidth;
-        canvas.canvas.height = window.innerHeight;
 
-        const WIDTH = window.innerWidth;
-        const HEIGHT = window.innerHeight;
-
+        var canvas;
+        var WIDTH;
+        var HEIGHT;
+        var HORIZON;
         const LINE_COL = "#0E00EE"
         const BACK_COL = "#000000"
-        const HORIZON = HEIGHT / 2
+
+        var firstLoad = false
+        var lastLink;
+
+        function init() {
+            if (!firstLoad)
+                clearInterval(lastLink)
+
+            firstLoad = true
+
+            canvas = document.getElementById("screen").getContext("2d");
+            canvas.fillRect(0, 0, canvas.width, canvas.height);
+            canvas.canvas.width  = window.innerWidth;
+            canvas.canvas.height = window.innerHeight;
+
+            WIDTH = window.innerWidth;
+            HEIGHT = window.innerHeight;
+            HORIZON = HEIGHT / 2
+            canvas.fillStyle = BACK_COL
+            canvas.fillRect(0, 0, WIDTH, HEIGHT)
+            draw_sun()
+            
+            lastLink = setInterval(fps, 10)
+            
+        }
+
 
         const SPEED = 1
+        var lines = [];
+        count = 0
+
+        last_time = performance.now()
+        fps_time = 80
+        interval = 1000 / fps_time + 1
+        
+        function update() {
+            // Update Canvas
+            canvas.fillStyle = BACK_COL
+            canvas.fillRect(0, HORIZON, WIDTH, HEIGHT)
+
+            drawBackground()
+
+            if (count++ > 60){
+                count = 0
+                lines.push(new Line(10))
+            }
+
+            for (var i = lines.length - 1; i >= 0; i--) {
+                if (updateLine(lines[i]))
+                    lines.splice(i, 1);
+            }
+        }
+
+        function fps(){
+            new_time = performance.now()
+            delta = new_time - last_time
+            if (delta >= interval) {
+                last_time = new_time
+                update()
+            }
+        }
 
         class Line{
             constructor(val){
@@ -35,7 +90,6 @@
                 this.yPos = val
             }
         }
-        var lines = [];
 
         function updateLine(line){
             line.yPos *= (SPEED * 1.01)
@@ -100,44 +154,8 @@
             var charStr = String.fromCharCode(charCode);
         };
 
-        count = 0
+        init();
 
-        function update() {
-            // Update Canvas
-            canvas.fillStyle = BACK_COL
-            canvas.fillRect(0, HORIZON, WIDTH, HEIGHT)
-
-            drawBackground()
-
-            if (count++ > 60){
-                count = 0
-                lines.push(new Line(10))
-            }
-
-            for (var i = lines.length - 1; i >= 0; i--) {
-                if (updateLine(lines[i]))
-                    lines.splice(i, 1);
-            }
-        }
-
-        last_time = performance.now()
-        fps_time = 80
-        interval = 1000 / fps_time + 1
-
-        function fps(){
-            new_time = performance.now()
-            delta = new_time - last_time
-            if (delta >= interval) {
-                last_time = new_time
-                update()
-            }
-        }
-
-        canvas.fillStyle = BACK_COL
-        canvas.fillRect(0, 0, WIDTH, HEIGHT)
-        draw_sun()
-        console.log("Running in window: "+window.innerWidth+" x "+window.innerHeight);
-        setInterval(fps, 10)
     </script>
 </body>
 </html>

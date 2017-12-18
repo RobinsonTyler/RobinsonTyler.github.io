@@ -53,6 +53,10 @@
             var oldY = s.yPos
             s.xPos += (s.xVel * s.vel) + (OFFSET[0]*CONTROL_SPEED);
             s.yPos += (s.yVel * s.vel) + (OFFSET[1]*CONTROL_SPEED);
+
+            // s.xPos += ((s.xVel + (OFFSET[0]*CONTROL_SPEED)) * s.vel) ;
+            // s.yPos += ((s.yVel + (OFFSET[1]*CONTROL_SPEED)) * s.vel) ;
+            
             s.size *= GROWTH_RATE;
             s.vel *= SPEED;
             canvas.fillStyle = "#FFFFFF";
