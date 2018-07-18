@@ -99,8 +99,20 @@ let game = function(sketch)
         {
             ship.draw();
         }
-        sketch.text("BETA", config.DIMENSIONS.x * 7/ 8, config.DIMENSIONS.y / 8, config.DIMENSIONS.x / 18, config.DIMENSIONS.y / 18);
+        sketch.text("BETA", config.DIMENSIONS.x * 7/ 8, config.DIMENSIONS.y * 7 / 8, config.DIMENSIONS.x / 18, config.DIMENSIONS.y / 18);
         lastDelta = update;
+    }
+
+    updatePress = function(x, y, pressed)
+    {
+        if (y > config.DIMENSIONS.y / 3)
+        {
+
+            if (x < config.DIMENSIONS.x / 2)
+                leftKeyDown = pressed;
+            else
+                rightKeyDown = pressed;
+        } else fireKeyDown = pressed;
     }
 
     updateKeys = function(pressed)
@@ -130,6 +142,16 @@ let game = function(sketch)
     sketch.keyReleased = function()
     {
         updateKeys(false);
+    }
+
+    sketch.mousePressed = function()
+    {
+        updatePress(sketch.mouseX, sketch.mouseY, true);
+    }
+
+    sketch.mouseReleased = function()
+    {
+        updatePress(sketch.mouseX, sketch.mouseY, false);
     }
 }
 
