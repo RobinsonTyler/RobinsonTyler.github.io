@@ -33,7 +33,7 @@ let game = function(sketch)
 
         ship = new Ship(sketch, config);
         lastDelta = sketch.millis();
-    }
+    };
 
     sketch.preload = function()
     {
@@ -42,16 +42,22 @@ let game = function(sketch)
         config.spritesheet = sketch.loadImage("space_invade/res/spritesheet.png");
         config.explosion = sketch.loadSound("space_invade/res/sfx/enemy_explosion.ogg");
         config.shoot = sketch.loadSound("space_invade/res/sfx/laser.ogg");
-    }
+        config.font = sketch.loadImage("space_invade/res/font.png",
+            function(){
+                config.cacheText();
+                level.initialize();
+            }
+        );
+    };
 
     sketch.windowResized = function() {
         config.windowResized();
         sketch.resizeCanvas(config.DIMENSIONS.x, config.DIMENSIONS.y);
-    }
+    };
 
     function detectCollisions()
     {
-        level.detectCollisions(projectiles);
+        level.detectCollisions(projectiles, ship);
     }
 
     function handleMovement(update)
@@ -77,6 +83,7 @@ let game = function(sketch)
         let delta = (update - lastDelta);
         handleMovement(delta);
         detectCollisions();
+        sketch.smooth();
         for (let i = stars.length - 1; i >= 0; --i)
         {
             if (stars[i].y > 100)
@@ -87,6 +94,7 @@ let game = function(sketch)
                 stars[i].draw();
             }
         }
+        sketch.noSmooth();
         for (let i = projectiles.length - 1; i >= 0; --i)
         {
             if (projectiles[i].y < -0.1 || projectiles[i].impacted)
@@ -96,12 +104,9 @@ let game = function(sketch)
         }
         level.draw(delta);
         if (ship)
-        {
             ship.draw();
-        }
-        sketch.text("BETA", config.DIMENSIONS.x * 7/ 8, config.DIMENSIONS.y * 7 / 8, config.DIMENSIONS.x / 18, config.DIMENSIONS.y / 18);
         lastDelta = update;
-    }
+    };
 
     updatePress = function(x, y, pressed)
     {

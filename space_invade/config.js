@@ -1,3 +1,5 @@
+const TEXT_PER_ROW = 15;
+const TEXT = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
 let Config = function (p5Instance)
 {
@@ -7,9 +9,11 @@ let Config = function (p5Instance)
     this.USE_DEFAULT_SCREEN = false;
     this.FIRE_COOLDOWN_TIME = 50;
     this.SCALE = 1;
-    this.DEFAULT_ENEMY_SPEED = .2;
+    this.DEFAULT_ENEMY_SPEED = 0.2;
+    this.DEFAULT_ENEMY_DROP_SPEED = 0.2;
     this.DIMENSIONS = {x: this.DEFAULT_DIM.x, y: this.DEFAULT_DIM.y};
     this.spritesheet;
+    this.font;
     this.shoot;
     this.explosion;
 
@@ -55,5 +59,48 @@ let Config = function (p5Instance)
         let img = this.spritesheet.get(x, y, w, h);
         this.image_cache[x+"_"+y] = img;
         return img;
+    };
+
+    this.cacheText = function()
+    {
+        const DIM = 20;
+        for (var i = 0; i < TEXT.length; i++) {
+            let x = i % TEXT_PER_ROW;
+            let y = Math.floor(i / TEXT_PER_ROW);
+            let img = this.font.get(x * DIM, y * DIM, DIM, DIM);
+            this.image_cache["char_"+TEXT[i]] = img;
+        }
+    }
+
+    this.createNewText = function(text)
+    {
+        let width = text.length * 20;
+        let img = p5Instance.createImage(width, 20);
+        let char;
+        let lastWidth = 0;
+        for (let i = 0; i < text.length; i++) {
+            if (text[i] == " ")
+            {
+                lastWidth += 16;
+                continue;
+            }
+            char = this.image_cache["char_"+text[i]];
+            img.blend(char, 0, 0, 20, 20, lastWidth, 0, 20, 20, p5Instance.OVERLAY);
+            lastWidth += 16;
+            if ("WMwm".indexOf(text[i]) >= 0) lastWidth += 4;
+        }
+        // img.updatePixels();
+        return img;
+    }
+
+    this.loadText = function(text)
+    {
+        if (Object.keys(this.image_cache).length == 0) return;
+        let cached = this.image_cache["text_"+text];
+        if (cached)
+            return cached;
+        cached = this.createNewText(text);
+        this.image_cache["text_"+text] = cached;
+        return cached;
     };
 };

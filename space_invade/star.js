@@ -16,7 +16,7 @@ class Star extends Drawable {
         this.animCounter = Math.random() * 800;
         this.growing = true;
         this.animating = false;
-        this.animTime = 20;
+        this.animTime = 5;
     }
 
 }
