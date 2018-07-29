@@ -103,4 +103,14 @@ let Config = function (p5Instance)
         this.image_cache["text_"+text] = cached;
         return cached;
     };
+
+    this.drawText = function(text, x, y, scale = 1, rightAligned = true)
+    {
+        if (!rightAligned) p5Instance.imageMode(p5Instance.CENTER);
+        x = (x / 100) * this.DIMENSIONS.x;
+        y = (y / 100) * this.DIMENSIONS.y;
+        scale *= this.SCALE;
+        p5Instance.image(text, x, y, text.width * scale, text.height * scale);
+        p5Instance.imageMode(p5Instance.CORNER);
+    }
 };

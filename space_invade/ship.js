@@ -8,11 +8,11 @@ class Ship extends Drawable {
         this.hit = false;
         this.firing = -1;
         this.speed = 0.03;
-        this.f_image = config.getImage(0, 128, 16, 16);
-        this.r_image = config.getImage(16, 128, 16, 16);
-        this.l_image = config.getYFlippedImage(16, 128, 16, 16);
-        this.shield = config.getImage(0, 144, 16, 16);
-        this.dead_image = config.getImage(16, 144, 16, 16);
+        this.f_image = config.getImage(0, 144, 16, 16);
+        this.r_image = config.getImage(16, 144, 16, 16);
+        this.l_image = config.getYFlippedImage(16, 144, 16, 16);
+        this.shield = config.getImage(0, 160, 16, 16);
+        this.dead_image = config.getImage(16, 160, 16, 16);
         this.extra_life_image = config.getImage(0, 65, 8, 8);
         this.image = this.f_image;
     }
@@ -39,10 +39,17 @@ class Ship extends Drawable {
     {
         this.sketch.image(this.image, this.getX(), this.getY(),
             this.getWidth(), this.getHeight());
+        if (this.hit && this.shieldCooldown <= 0)
+        {
+            this.hit = false;
+            this.shieldCooldown = 60;
+            this.lives--;
+        }
         if (this.lives <= 0)
         {
             // Disable firing
             this.firing = 10;
+            this.shieldCooldown = -1;
             return;
         } else {
             for (var i = 1; i < this.lives; i++) {
@@ -52,12 +59,6 @@ class Ship extends Drawable {
             }
         }
         if (this.firing >= 0) this.firing--;
-        if (this.hit && this.shieldCooldown <= 0)
-        {
-            this.hit = false;
-            this.shieldCooldown = 60;
-            this.lives--;
-        }
         if (this.shieldCooldown > 0)
         {
             this.shieldCooldown -= 1;

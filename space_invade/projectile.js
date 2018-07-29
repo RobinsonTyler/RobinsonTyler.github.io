@@ -13,16 +13,16 @@ class Projectile extends Drawable {
         this.pics.push(config.getYFlippedImage(26, 119, 6, 9));
         this.impacted = false;
     }
-
-    draw(update){
-        this.timer++;
-        if (this.timer > this.imageUpdate)
-        {
-            this.timer = 0;
-            this.imageIndex = ++this.imageIndex % 2;
-        }
-        this.sketch.image(this.pics[this.imageIndex],
-            this.getX(), this.getY(), this.getWidth(), this.getHeight());
-        this.y += (this.yVel * update / 25);
-    }
 }
+
+Projectile.prototype.draw = function(update){
+    this.timer++;
+    if (this.timer > this.imageUpdate)
+    {
+        this.timer = 0;
+        this.imageIndex = ++this.imageIndex % 2;
+    }
+    this.sketch.image(this.pics[this.imageIndex],
+        this.getX(), this.getY(), this.getWidth(), this.getHeight());
+    this.y += (this.yVel * update / 25);
+};

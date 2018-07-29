@@ -1,15 +1,25 @@
 const LEVELS = [
     [
-        [1, 1, 1, 1],
-        [1, 1, 1, 1]
+        [1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1]
     ],
     [
-        [1, 1, 2, 1, 1],
-        [1, 1, 2, 1, 1],
+        [1, 1, 1, 1, 1, 1],
+        [0, 1, 1, 1, 1, 0],
+        [0, 0, 1, 1, 0, 0],
     ],
     [
-        [1, 2, 3, 2, 1],
-        [1, 2, 3, 2, 1],
+        [1, 2, 1, 2, 1, 2, 1],
+        [1, 2, 1, 2, 1, 2, 1],
+    ],
+    [
+        [1, 2, 2, 2, 2, 1],
+        [1, 2, 2, 2, 2, 1],
+    ],
+    [
+        [3, 3, 3, 3, 3],
+        [1, 2, 2, 2, 1],
+        [1, 1, 1, 1, 1]
     ],
 ]
 
@@ -94,15 +104,8 @@ class Level
     initialize()
     {
         this.messages = {
-            version : this.config.loadText("~ BETA ~"),
-            win     : this.config.loadText("You Win!"),
-            lose    : this.config.loadText("Game Over"),
-            author  : this.config.loadText("Tyler Robinson"),
-            year    : this.config.loadText("2018"),
-            left    : this.config.loadText("[A] or [<] = Left"),
-            right   : this.config.loadText("[D] or [>] = Right"),
-            fire    : this.config.loadText("[W] or [^] = Fire"),
-            control_header : this.config.loadText("Controls:"),
+            win   : this.config.loadText("You Win!"),
+            lose  : this.config.loadText("Game Over"),
         };
         this.levelMessages = [
             this.config.loadText("Level 1"),
@@ -172,7 +175,7 @@ class Level
             }
             if (Math.random() < this.fireChance)
                 blasts.push(
-                    new EnergyBlast(sketch, config, enemies[i].x, enemies[i].y, .4));
+                    new EnergyBlast(sketch, config, enemies[i].x, enemies[i].y, .4, enemies[i].variant));
             if (this.edgeHit) continue;
             if (this.enemies[i].x < 0 || this.enemies[i].x > this.xLim)
                edgeDetected = true;
@@ -207,43 +210,29 @@ class Level
 
     }
 
-    drawText(text, x, y, scale = 1)
-    {
-        this.sketch.imageMode(this.sketch.CENTER);
-        x = (x / 100) * this.config.DIMENSIONS.x;
-        y = (y / 100) * this.config.DIMENSIONS.y;
-        scale *= this.config.SCALE;
-        this.sketch.image(text, x, y, text.width * scale, text.height * scale);
-        this.sketch.imageMode(this.sketch.CORNER);
-    }
-
     draw(update)
     {
         let {sketch, config, explosions, blasts, enemies, messages} = this;
-        if (!update || isNaN(update))
-            update = 1.0 / 60;
         if (enemies.length == 0 || enemies[0].y > 100)
             this.initEnemies();
         if (this.levelTitleTimer > 0)
         {
             this.levelTitleTimer -= update;
             if (this.currentLevel <= LEVELS.length)
-                this.drawText(this.levelMessages[this.currentLevel - 1], 50, 50, 1);
+                this.config.drawText(this.levelMessages[this.currentLevel - 1], 50, 50, 1, false);
             else
-                this.drawText(this.messages.win, 50, 50, 1);
-        } else {
-            if (this.shouldRenderEnemies)
-                this.updateEnemies(update);
+                this.config.drawText(this.messages.win, 50, 50, 1, false);
         }
+        else if (this.shouldRenderEnemies) this.updateEnemies(update);
+
         for (let i = explosions.length -1; i >= 0; i--)
         {
             if (explosions[i].done)
             {
                 explosions.splice(i, 1);
                 continue;
-            } else {
+            } else
                 explosions[i].draw();
-            }
         }
         for (let i = blasts.length -1; i >= 0; i--)
         {
@@ -251,13 +240,8 @@ class Level
             {
                 blasts.splice(i, 1);
                 continue;
-            } else {
+            } else
                 blasts[i].draw(update);
-            }
         }
-        if (!this.initialized) return;
-        this.drawText(messages.version, 20, 10, 0.5);
-        this.drawText(messages.author, 94, 96, 0.15);
-        this.drawText(messages.year, 94, 98, 0.15);
     }
 }

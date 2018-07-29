@@ -7,5 +7,27 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #555555;
+  background-color: #131313;
+}
+img {
+    position: absolute;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: pixelated;
+    width:100%;
+    z-index: -1;
+}
+
+#gameContainer{
+    display:inline-block;
+    margin: 0 auto;
+    background: black;
+    position:relative;
+    border:5px solid black;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px 20px #000;
+}
+
+#gameCanvas{
+    position:relative;
+    z-index:50;
 }

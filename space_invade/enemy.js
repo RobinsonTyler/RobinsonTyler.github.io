@@ -10,6 +10,7 @@ class Enemy extends Drawable
         this.timer = 0;
         this.imageIndex = 0;
         this.hit = false;
+        this.variant = type;
     }
 
     move(deltaX, deltaY)

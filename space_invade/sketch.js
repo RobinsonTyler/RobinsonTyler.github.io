@@ -10,14 +10,16 @@ let game = function(sketch)
     let projectiles = Array();
     let ship;
     let level;
+    let title_card;
 
     let lastDelta;
+    let titleScreenTime;
 
     sketch.setup = function () {
         leftKeyDown = false;
         rightKeyDown = false;
         fireKeyDown = false;
-        ship;
+        titleScreenTime = 6000;
         stars = Array();
         projectiles = Array();
         sketch.createCanvas(config.DIMENSIONS.x, config.DIMENSIONS.y);
@@ -46,9 +48,24 @@ let game = function(sketch)
             function(){
                 config.cacheText();
                 level.initialize();
+                createMessages();
             }
         );
+        title_card = sketch.loadImage("space_invade/res/title.png");
     };
+
+    function createMessages()
+    {
+        this.messages = {
+            version : config.loadText("~ BETA ~"),
+            author  : config.loadText("Tyler Robinson"),
+            year    : config.loadText("2018"),
+            left    : config.loadText("[A] or [<] = Left"),
+            right   : config.loadText("[D] or [>] = Right"),
+            fire    : config.loadText("[W] or [^] = Fire"),
+            control_header : config.loadText("Controls:"),
+        };
+    }
 
     sketch.windowResized = function() {
         config.windowResized();
@@ -77,34 +94,58 @@ let game = function(sketch)
         }
     }
 
+    function drawLabels()
+    {
+        config.drawText(messages.version, 20, 10, 0.5, false);
+        config.drawText(messages.author, 94, 96, 0.15, false);
+        config.drawText(messages.year, 94, 98, 0.15, false);
+    }
+
+    function drawControls()
+    {
+        config.drawText(messages.control_header, 45, 58, .8);
+        config.drawText(messages.right, 50, 64, .5);
+        config.drawText(messages.left , 50, 68, .5);
+        config.drawText(messages.fire , 50, 72, .5);
+    }
     sketch.draw = function() {
         sketch.background(0);
         let update = sketch.millis();
         let delta = (update - lastDelta);
-        handleMovement(delta);
-        detectCollisions();
-        sketch.smooth();
-        for (let i = stars.length - 1; i >= 0; --i)
+        if (!delta || isNaN(delta))
+            delta = 1 / 60;
+        if (titleScreenTime > 0)
         {
-            if (stars[i].y > 100)
-                stars[i] = new Star(sketch, config);
-            else
+            titleScreenTime -= delta;
+            sketch.image(title_card, 0, 0, config.DIMENSIONS.x, config.DIMENSIONS.y);
+            drawControls();
+        } else {
+            handleMovement(delta);
+            detectCollisions();
+            sketch.smooth();
+            for (let i = stars.length - 1; i >= 0; --i)
             {
-                stars[i].update(delta);
-                stars[i].draw();
+                if (stars[i].y > 100)
+                    stars[i] = new Star(sketch, config);
+                else
+                {
+                    stars[i].update(delta);
+                    stars[i].draw();
+                }
             }
+            sketch.noSmooth();
+            for (let i = projectiles.length - 1; i >= 0; --i)
+            {
+                if (projectiles[i].y < -0.1 || projectiles[i].impacted)
+                    projectiles.splice(i, 1);
+                else
+                    projectiles[i].draw(delta);
+            }
+            level.draw(delta);
+            if (ship)
+                ship.draw();
         }
-        sketch.noSmooth();
-        for (let i = projectiles.length - 1; i >= 0; --i)
-        {
-            if (projectiles[i].y < -0.1 || projectiles[i].impacted)
-                projectiles.splice(i, 1);
-            else
-                projectiles[i].draw(delta);
-        }
-        level.draw(delta);
-        if (ship)
-            ship.draw();
+        drawLabels();
         lastDelta = update;
     };
 
@@ -161,7 +202,7 @@ let game = function(sketch)
 }
 
 try {
-    new p5(game);
+    new p5(game, "gameContainer");
 } catch (error) {
     alert("Error ocurred, cannot continue..");
 }
