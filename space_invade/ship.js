@@ -41,6 +41,7 @@ class Ship extends Drawable {
             this.getWidth(), this.getHeight());
         if (this.hit && this.shieldCooldown <= 0)
         {
+            this.config.hit.play();
             this.hit = false;
             this.shieldCooldown = 60;
             this.lives--;

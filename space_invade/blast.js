@@ -1,8 +1,19 @@
 class EnergyBlast extends Drawable {
 
-    constructor(sketch, config, x, y, yVel, type=0) {
+    constructor(sketch, config, x, y, velocity, type=0) {
         super(sketch, config, x, y, 6, 9);
-        this.yVel = yVel;
+
+        switch (type)
+        {
+            case 1:
+                this.yVel = velocity / 256;
+                break;
+            case 2:
+                this.yVel = velocity / 32;
+                break;
+            default:
+                this.yVel = velocity / 16;
+        }
 
         let wid = 7;
         this.pics = [
@@ -32,17 +43,17 @@ EnergyBlast.prototype.draw = function(update){
         this.getX(), this.getY(), this.getWidth(), this.getHeight());
     switch (this.variant)
     {
-        default:
-            this.y += (this.yVel * update / 25);
-            break;
         case 1:
-            this.val += (this.yVel * update / 500);
+            this.val += (this.yVel * update);
             this.y += this.val;
             break;
         case 2:
             this.val += update;
-            this.y += (this.yVel * update / 25);
-            this.x += Math.sin(this.val / 400) / 5;
+            this.y += (this.yVel * update);
+            this.x += Math.sin(this.val / 400) / 4;
+            break;
+        default:
+            this.y += (this.yVel * update);
             break;
 
     }

@@ -10,7 +10,7 @@ let Config = function (p5Instance)
     this.FIRE_COOLDOWN_TIME = 50;
     this.SCALE = 1;
     this.DEFAULT_ENEMY_SPEED = 0.2;
-    this.DEFAULT_ENEMY_DROP_SPEED = 0.2;
+    this.DEFAULT_ENEMY_DROP_SPEED = 0.08;
     this.DIMENSIONS = {x: this.DEFAULT_DIM.x, y: this.DEFAULT_DIM.y};
     this.spritesheet;
     this.font;

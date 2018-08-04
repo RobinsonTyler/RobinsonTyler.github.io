@@ -4,16 +4,16 @@ const LEVELS = [
         [1, 1, 1, 1, 1, 1]
     ],
     [
-        [1, 1, 1, 1, 1, 1],
+        [1, 1, 2, 2, 1, 1],
         [0, 1, 1, 1, 1, 0],
         [0, 0, 1, 1, 0, 0],
     ],
     [
         [1, 2, 1, 2, 1, 2, 1],
-        [1, 2, 1, 2, 1, 2, 1],
+        [2, 1, 2, 1, 2, 1, 2],
     ],
     [
-        [1, 2, 2, 2, 2, 1],
+        [1, 2, 3, 3, 2, 1],
         [1, 2, 2, 2, 2, 1],
     ],
     [
@@ -97,7 +97,9 @@ class Level
     {
         let enemiesDefeated = getEnemyCount(this.currentLevel) - this.enemies.length;
         this.speed += enemiesDefeated * 0.01;
-        this.fireChance += enemiesDefeated * 0.0002;
+        this.fireChance += enemiesDefeated * 50;
+        if (this.fireChance >= 1700)
+            this.fireChance = 1700;
         this.updateSpeed = false;
     }
 
@@ -156,6 +158,7 @@ class Level
                     {
                         ship.hit = true;
                         projectile.impacted = true;
+                        this.explosions.push(new Explosion(this.sketch, this.config, ship.x, ship.y - 4));
                     }
                 }
         }
@@ -173,9 +176,12 @@ class Level
                 enemies.splice(i, 1);
                 continue;
             }
-            if (Math.random() < this.fireChance)
+            if (enemies[i].firingTime < this.fireChance)
+            {
+                enemies[i].resetFiringTimer();
                 blasts.push(
-                    new EnergyBlast(sketch, config, enemies[i].x, enemies[i].y, .4, enemies[i].variant));
+                    new EnergyBlast(sketch, config, enemies[i].x, enemies[i].y, 0.7, enemies[i].variant));
+            }
             if (this.edgeHit) continue;
             if (this.enemies[i].x < 0 || this.enemies[i].x > this.xLim)
                edgeDetected = true;
@@ -205,7 +211,7 @@ class Level
         }
         for (var i = 0; i < enemies.length; i++) {
             enemies[i].move(this.deltaX, this.deltaY);
-            enemies[i].draw();
+            enemies[i].draw(update);
         }
 
     }

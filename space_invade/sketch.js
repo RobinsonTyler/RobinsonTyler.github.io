@@ -44,6 +44,7 @@ let game = function(sketch)
         config.spritesheet = sketch.loadImage("space_invade/res/spritesheet.png");
         config.explosion = sketch.loadSound("space_invade/res/sfx/enemy_explosion.ogg");
         config.shoot = sketch.loadSound("space_invade/res/sfx/laser.ogg");
+        config.hit = sketch.loadSound("space_invade/res/sfx/player_explosion.ogg");
         config.font = sketch.loadImage("space_invade/res/font.png",
             function(){
                 config.cacheText();
@@ -103,12 +104,14 @@ let game = function(sketch)
 
     function drawControls()
     {
-        config.drawText(messages.control_header, 45, 58, .8);
-        config.drawText(messages.right, 50, 64, .5);
-        config.drawText(messages.left , 50, 68, .5);
-        config.drawText(messages.fire , 50, 72, .5);
+        config.drawText(messages.control_header, 45, 58, 0.8);
+        config.drawText(messages.right, 50, 64, 0.5);
+        config.drawText(messages.left , 50, 68, 0.5);
+        config.drawText(messages.fire , 50, 72, 0.5);
     }
-    sketch.draw = function() {
+
+    sketch.draw = function()
+    {
         sketch.background(0);
         let update = sketch.millis();
         let delta = (update - lastDelta);
@@ -141,9 +144,9 @@ let game = function(sketch)
                 else
                     projectiles[i].draw(delta);
             }
-            level.draw(delta);
             if (ship)
                 ship.draw();
+            level.draw(delta);
         }
         drawLabels();
         lastDelta = update;
@@ -159,7 +162,7 @@ let game = function(sketch)
             else
                 rightKeyDown = pressed;
         } else fireKeyDown = pressed;
-    }
+    };
 
     updateKeys = function(pressed)
     {
@@ -178,28 +181,28 @@ let game = function(sketch)
             ) {
             fireKeyDown = pressed;
         }
-    }
+    };
 
     sketch.keyPressed = function()
     {
         updateKeys(true);
-    }
+    };
 
     sketch.keyReleased = function()
     {
         updateKeys(false);
-    }
+    };
 
     sketch.mousePressed = function()
     {
         updatePress(sketch.mouseX, sketch.mouseY, true);
-    }
+    };
 
     sketch.mouseReleased = function()
     {
         updatePress(sketch.mouseX, sketch.mouseY, false);
-    }
-}
+    };
+};
 
 try {
     new p5(game, "gameContainer");

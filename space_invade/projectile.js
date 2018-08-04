@@ -24,5 +24,5 @@ Projectile.prototype.draw = function(update){
     }
     this.sketch.image(this.pics[this.imageIndex],
         this.getX(), this.getY(), this.getWidth(), this.getHeight());
-    this.y += (this.yVel * update / 25);
+    this.y += (this.yVel * update / 15);
 };
