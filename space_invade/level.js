@@ -67,7 +67,7 @@ class Level
         this.enemies = [];
         if (this.currentLevel >= LEVELS.length)
         {
-            console.log("You win!");
+
             this.shouldRenderEnemies = false;
         }
         if (currentLevel < LEVELS.length)
@@ -91,6 +91,9 @@ class Level
         this.deltaX = this.speed;
         this.updateDifficulty();
         this.levelTitleTimer = 3000;
+        this.hasLost = false;
+        this.loseDelayCounter = 2000;
+        this.replayDelayCounter = 1000;
     }
 
     updateDifficulty()
@@ -108,6 +111,7 @@ class Level
         this.messages = {
             win   : this.config.loadText("You Win!"),
             lose  : this.config.loadText("Game Over"),
+            replay: this.config.loadText("Press 'F5' to play again!")
         };
         this.levelMessages = [
             this.config.loadText("Level 1"),
@@ -124,6 +128,27 @@ class Level
 
     detectCollisions(projectiles, ship)
     {
+        let projectileW, projectileH;
+        let enemyW, enemyH;
+        let blastW, blastH;
+        if (projectiles.length > 0)
+        {
+            projectileW = projectiles[0].getWidth();
+            projectileH = projectiles[0].getHeight();
+        }
+        if (this.enemies.length > 0)
+        {
+            enemyW = this.enemies[0].getWidth();
+            enemyH = this.enemies[0].getHeight();
+        }
+        if (this.blasts.length > 0)
+        {
+            blastW = this.blasts[0].getWidth();
+            blastH = this.blasts[0].getHeight();
+        }
+        this.hasLost = ship.lives <= 0;
+        if (this.hasLost && this.vertSpeed > 0)
+            this.vertSpeed *= -3;
         if (this.levelTitleTimer <= 0)
         {
             for (let p = 0; p < projectiles.length; p++)
@@ -132,11 +157,11 @@ class Level
                 {
                     let projectile = projectiles[p];
                     let enemy = this.enemies[e];
-                    if (projectile.getY() <= enemy.getY() + enemy.getHeight() &&
-                        projectile.getY() + projectile.getHeight() >= enemy.getY())
+                    if (projectile.getY() <= enemy.getY() + enemyH &&
+                        projectile.getY() + projectileH >= enemy.getY())
                     {
-                        if (projectile.getX() < enemy.getX() + enemy.getWidth() &&
-                            projectile.getX() + projectile.getWidth() > enemy.getX())
+                        if (projectile.getX() < enemy.getX() + enemyW &&
+                            projectile.getX() + projectileW > enemy.getX())
                         {
                             enemy.hit = true;
                             projectile.impacted = true;
@@ -149,15 +174,15 @@ class Level
             }
         }
         for (var i = 0; i < this.blasts.length; i++) {
-            let projectile = this.blasts[i];
-            if (projectile.getY() <= ship.getY() + ship.getHeight() &&
-                    projectile.getY() + projectile.getHeight() >= ship.getY())
+            let blast = this.blasts[i];
+            if (blast.getY() <= ship.getY() + (ship.getHeight() / 2) &&
+                    blast.getY() + blastH >= ship.getY())
                 {
-                if (projectile.getX() < ship.getX() + ship.getWidth() &&
-                        projectile.getX() + projectile.getWidth() > ship.getX())
+                if (blast.getX() < ship.getX() + ship.getWidth() &&
+                        blast.getX() + blastW > ship.getX())
                     {
                         ship.hit = true;
-                        projectile.impacted = true;
+                        blast.impacted = true;
                         this.explosions.push(new Explosion(this.sketch, this.config, ship.x, ship.y - 4));
                     }
                 }
@@ -219,15 +244,40 @@ class Level
     draw(update)
     {
         let {sketch, config, explosions, blasts, enemies, messages} = this;
+        if (this.hasLost)
+        {
+            this.shouldRenderEnemies = enemies.length == 0 ||
+                enemies[enemies.length - 1].y > -10;
+            if (this.loseDelayCounter <= 0)
+            {
+                config.drawText(this.messages.lose, 50, 50, 1, false);
+                if (this.replayDelayCounter <= 0)
+                    config.drawText(this.messages.replay, 52, 60, 0.4, false);
+                else
+                    this.replayDelayCounter -= update;
+            }
+            else
+                this.loseDelayCounter -= update;
+        }
         if (enemies.length == 0 || enemies[0].y > 100)
             this.initEnemies();
         if (this.levelTitleTimer > 0)
         {
-            this.levelTitleTimer -= update;
             if (this.currentLevel <= LEVELS.length)
+            {
+
+                this.levelTitleTimer -= update;
                 this.config.drawText(this.levelMessages[this.currentLevel - 1], 50, 50, 1, false);
+            }
             else
+            {
+                this.shouldRenderEnemies = false;
                 this.config.drawText(this.messages.win, 50, 50, 1, false);
+                if (this.replayDelayCounter <= 0)
+                    config.drawText(this.messages.replay, 52, 60, 0.4, false);
+                else
+                    this.replayDelayCounter -= update;
+            }
         }
         else if (this.shouldRenderEnemies) this.updateEnemies(update);
 
